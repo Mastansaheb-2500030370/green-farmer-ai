@@ -1,0 +1,225 @@
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+
+const GATEWAY = "https://ai.gateway.lovable.dev/v1";
+
+const LANGUAGE_NAMES: Record<string, string> = {
+  en: "English",
+  hi: "Hindi",
+  mr: "Marathi",
+  bn: "Bengali",
+  te: "Telugu",
+  ta: "Tamil",
+  kn: "Kannada",
+};
+
+function apiKey() {
+  const key = process.env["LOVABLE_API_KEY"];
+  if (!key) throw new Error("AI is not configured for this app.");
+  return key;
+}
+
+async function chat(body: Record<string, unknown>) {
+  const res = await fetch(`${GATEWAY}/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey()}`,
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    if (res.status === 429) throw new Error("Too many requests right now. Please try again in a minute.");
+    if (res.status === 402) throw new Error("The AI credits for this app have run out.");
+    throw new Error(`AI request failed [${res.status}]: ${text}`);
+  }
+  const json = (await res.json()) as {
+    choices?: { message?: { content?: string } }[];
+  };
+  return json.choices?.[0]?.message?.content ?? "";
+}
+
+const AnalyzeInput = z.object({
+  imageDataUrl: z.string().min(20),
+  language: z.string().min(2).max(5),
+});
+
+export type DiseaseResult = {
+  crop: string;
+  disease: string;
+  healthy: boolean;
+  severityLabel: string;
+  severityScore: number;
+  summary: string;
+  steps: string[];
+  prevention: string[];
+};
+
+export const analyzePlant = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => AnalyzeInput.parse(input))
+  .handler(async ({ data }): Promise<DiseaseResult> => {
+    const language = LANGUAGE_NAMES[data.language] ?? "English";
+    const content = await chat({
+      model: "google/gemini-3.8-flash",
+      messages: [
+        {
+          role: "system",
+          content:
+            `You are an experienced Indian agronomist helping a small farmer. Look at the plant photo and identify the crop and any disease or pest damage. ` +
+            `Write everything in ${language}, in very simple words a farmer with little schooling understands. Give practical, low-cost, locally available treatments with clear quantities. ` +
+            `Reply ONLY with JSON matching: {"crop":string,"disease":string,"healthy":boolean,"severityLabel":string,"severityScore":number,"summary":string,"steps":string[],"prevention":string[]}. ` +
+            `severityScore is 0-100. steps has 3-4 short actions. prevention has 2-3 short tips. If the photo is not a plant, set disease to a short note saying so and healthy true.`,
+        },
+        {
+          role: "user",
+          content: [
+            { type: "text", text: "Which disease is on this plant and what should I do?" },
+            { type: "image_url", image_url: { url: data.imageDataUrl } },
+          ],
+        },
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    let parsed: Partial<DiseaseResult> = {};
+    try {
+      parsed = JSON.parse(content.replace(/^```(?:json)?|```$/g, "").trim());
+    } catch {
+      parsed = { disease: content.slice(0, 200) };
+    }
+
+    return {
+      crop: parsed.crop ?? "",
+      disease: parsed.disease ?? "Unknown",
+      healthy: Boolean(parsed.healthy),
+      severityLabel: parsed.severityLabel ?? "low",
+      severityScore: Number(parsed.severityScore ?? 0),
+      summary: parsed.summary ?? "",
+      steps: Array.isArray(parsed.steps) ? parsed.steps.map(String) : [],
+      prevention: Array.isArray(parsed.prevention) ? parsed.prevention.map(String) : [],
+    };
+  });
+
+const AskInput = z.object({
+  language: z.string().min(2).max(5),
+  messages: z
+    .array(z.object({ role: z.enum(["user", "assistant"]), content: z.string().min(1) }))
+    .min(1)
+    .max(40),
+});
+
+export const askAssistant = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => AskInput.parse(input))
+  .handler(async ({ data }) => {
+    const language = LANGUAGE_NAMES[data.language] ?? "English";
+    const answer = await chat({
+      model: "google/gemini-3.8-flash",
+      messages: [
+        {
+          role: "system",
+          content:
+            `You are KisanSahayak, a friendly farming assistant for Indian farmers. Answer in ${language} only, in short simple sentences (max 6 sentences). ` +
+            `Give practical advice on crop care, irrigation, fertiliser, pests, diseases, seed choice and getting a higher yield. Use local units (acre, litre, kg). ` +
+            `If a question is not about farming, gently bring it back to the farm.`,
+        },
+        ...data.messages,
+      ],
+    });
+    return { answer };
+  });
+
+const YieldInput = z.object({
+  language: z.string().min(2).max(5),
+  crop: z.string().max(60).optional(),
+});
+
+export const getYieldTips = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => YieldInput.parse(input))
+  .handler(async ({ data }) => {
+    const language = LANGUAGE_NAMES[data.language] ?? "English";
+    const content = await chat({
+      model: "google/gemini-3.8-flash",
+      messages: [
+        {
+          role: "system",
+          content:
+            `You advise small Indian farmers on raising crop yield. Write in ${language}, very simple words. ` +
+            `Reply ONLY with JSON: {"tips":[{"title":string,"detail":string}]} with exactly 6 tips. Title max 6 words, detail max 15 words.`,
+        },
+        {
+          role: "user",
+          content: data.crop
+            ? `Give practical ways to get more yield from ${data.crop}.`
+            : "Give practical ways to get more yield this season.",
+        },
+      ],
+      response_format: { type: "json_object" },
+    });
+    try {
+      const parsed = JSON.parse(content.replace(/^```(?:json)?|```$/g, "").trim()) as {
+        tips?: { title: string; detail: string }[];
+      };
+      return { tips: parsed.tips ?? [] };
+    } catch {
+      return { tips: [] };
+    }
+  });
+
+const SpeakInput = z.object({
+  text: z.string().min(1).max(2000),
+  language: z.string().min(2).max(5),
+});
+
+export const speakText = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => SpeakInput.parse(input))
+  .handler(async ({ data }) => {
+    const language = LANGUAGE_NAMES[data.language] ?? "English";
+    const res = await fetch(`${GATEWAY}/audio/speech`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey()}`,
+      },
+      body: JSON.stringify({
+        model: "openai/gpt-4o-mini-tts",
+        input: data.text,
+        voice: "alloy",
+        response_format: "mp3",
+        instructions: `Speak in ${language} with a warm, calm, unhurried voice, as if talking to a farmer.`,
+      }),
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(`Voice failed [${res.status}]: ${text}`);
+    }
+    const buffer = await res.arrayBuffer();
+    return { audioBase64: Buffer.from(buffer).toString("base64") };
+  });
+
+const TranscribeInput = z.object({
+  audioBase64: z.string().min(100),
+  language: z.string().min(2).max(5),
+});
+
+export const transcribeAudio = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => TranscribeInput.parse(input))
+  .handler(async ({ data }) => {
+    const bytes = Buffer.from(data.audioBase64, "base64");
+    const form = new FormData();
+    form.append("model", "google/gemini-3.5-transcribe");
+    form.append("file", new Blob([new Uint8Array(bytes)], { type: "audio/wav" }), "recording.wav");
+    form.append("language", data.language);
+
+    const res = await fetch(`${GATEWAY}/audio/transcriptions`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey()}` },
+      body: form,
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(`Could not understand the recording [${res.status}]: ${text}`);
+    }
+    const json = (await res.json()) as { text?: string };
+    return { text: json.text ?? "" };
+  });

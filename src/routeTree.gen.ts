@@ -10,33 +10,83 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as MeRouteImport } from './routes/me'
+import { Route as ScanRouteImport } from './routes/scan'
+import { Route as TipsRouteImport } from './routes/tips'
+import { Route as VoiceRouteImport } from './routes/voice'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MeRoute = MeRouteImport.update({
+  id: '/me',
+  path: '/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScanRoute = ScanRouteImport.update({
+  id: '/scan',
+  path: '/scan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TipsRoute = TipsRouteImport.update({
+  id: '/tips',
+  path: '/tips',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VoiceRoute = VoiceRouteImport.update({
+  id: '/voice',
+  path: '/voice',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/me': typeof MeRoute
+  '/scan': typeof ScanRoute
+  '/tips': typeof TipsRoute
+  '/voice': typeof VoiceRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/me': typeof MeRoute
+  '/scan': typeof ScanRoute
+  '/tips': typeof TipsRoute
+  '/voice': typeof VoiceRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/me': typeof MeRoute
+  '/scan': typeof ScanRoute
+  '/tips': typeof TipsRoute
+  '/voice': typeof VoiceRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/auth' | '/me' | '/scan' | '/tips' | '/voice'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/auth' | '/me' | '/scan' | '/tips' | '/voice'
+  id: '__root__' | '/' | '/auth' | '/me' | '/scan' | '/tips' | '/voice'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
+  MeRoute: typeof MeRoute
+  ScanRoute: typeof ScanRoute
+  TipsRoute: typeof TipsRoute
+  VoiceRoute: typeof VoiceRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +98,51 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/me': {
+      id: '/me'
+      path: '/me'
+      fullPath: '/me'
+      preLoaderRoute: typeof MeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scan': {
+      id: '/scan'
+      path: '/scan'
+      fullPath: '/scan'
+      preLoaderRoute: typeof ScanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tips': {
+      id: '/tips'
+      path: '/tips'
+      fullPath: '/tips'
+      preLoaderRoute: typeof TipsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/voice': {
+      id: '/voice'
+      path: '/voice'
+      fullPath: '/voice'
+      preLoaderRoute: typeof VoiceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
+  MeRoute: MeRoute,
+  ScanRoute: ScanRoute,
+  TipsRoute: TipsRoute,
+  VoiceRoute: VoiceRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

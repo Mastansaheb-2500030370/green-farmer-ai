@@ -1,0 +1,153 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
+import { useI18n } from "@/lib/i18n";
+
+export const Route = createFileRoute("/auth")({
+  head: () => ({
+    meta: [
+      { title: "Farmer sign in — KisanSahayak" },
+      {
+        name: "description",
+        content: "Sign in or create a free farmer account to save your plant scans and crop records.",
+      },
+      { property: "og:title", content: "Farmer sign in — KisanSahayak" },
+      { property: "og:description", content: "Create a free account to save your plant scans and crop records." },
+    ],
+  }),
+  component: AuthPage,
+});
+
+function AuthPage() {
+  const { t } = useI18n();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [mode, setMode] = useState<"in" | "up">("in");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (user) navigate({ to: "/" });
+  }, [user, navigate]);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    try {
+      if (mode === "up") {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/`,
+            data: { full_name: fullName },
+          },
+        });
+        if (error) throw error;
+        toast.success(t("checkEmail"));
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Something went wrong");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const google = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/` },
+    });
+    if (error) toast.error(error.message);
+  };
+
+  const field =
+    "w-full rounded-2xl bg-cream-2 px-4 py-4 text-base font-medium text-soil ring-1 ring-black/10 outline-none focus:ring-2 focus:ring-leaf";
+
+  return (
+    <div className="min-h-screen bg-cream px-4 py-10">
+      <div className="mx-auto max-w-md">
+        <div className="mb-8 flex items-center gap-3">
+          <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-leaf font-display text-2xl font-bold text-cream">
+            K
+          </span>
+          <div className="min-w-0">
+            <h1 className="truncate font-display text-2xl font-semibold text-soil">{t("appName")}</h1>
+            <p className="truncate text-sm font-medium text-soil-500">{t("tagline")}</p>
+          </div>
+        </div>
+
+        <div className="mb-5 grid grid-cols-2 gap-2 rounded-2xl bg-cream-2 p-1.5 ring-1 ring-black/5">
+          {(["in", "up"] as const).map((m) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => setMode(m)}
+              className={`rounded-xl py-3 text-base font-semibold ${
+                mode === m ? "bg-leaf text-cream" : "text-soil-700"
+              }`}
+            >
+              {m === "in" ? t("signIn") : t("signUp")}
+            </button>
+          ))}
+        </div>
+
+        <form onSubmit={submit} className="space-y-3">
+          {mode === "up" ? (
+            <input
+              className={field}
+              placeholder={t("fullName")}
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              autoComplete="name"
+              required
+            />
+          ) : null}
+          <input
+            className={field}
+            type="email"
+            placeholder={t("email")}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            required
+          />
+          <input
+            className={field}
+            type="password"
+            placeholder={t("password")}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete={mode === "up" ? "new-password" : "current-password"}
+            minLength={6}
+            required
+          />
+          <button
+            type="submit"
+            disabled={busy}
+            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-leaf py-4 text-lg font-semibold text-cream ring-1 ring-leaf-700 disabled:opacity-70"
+          >
+            {busy ? <Loader2 className="size-5 animate-spin" /> : null}
+            {mode === "in" ? t("signIn") : t("signUp")}
+          </button>
+        </form>
+
+        <button
+          type="button"
+          onClick={google}
+          className="mt-3 w-full rounded-2xl bg-cream-2 py-4 text-base font-semibold text-soil ring-1 ring-black/10"
+        >
+          {t("continueGoogle")}
+        </button>
+      </div>
+    </div>
+  );
+}
