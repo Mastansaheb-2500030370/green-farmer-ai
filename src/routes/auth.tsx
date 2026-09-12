@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { useI18n } from "@/lib/i18n";
+import { LANGUAGES, useI18n, type LangCode } from "@/lib/i18n";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/auth")({
 });
 
 function AuthPage() {
-  const { t } = useI18n();
+  const { t, lang, setLang } = useI18n();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [mode, setMode] = useState<"in" | "up">("in");
@@ -45,14 +45,18 @@ function AuthPage() {
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/`,
-            data: { full_name: fullName },
+            data: { full_name: fullName, language: lang },
           },
         });
         if (error) throw error;
         toast.success(t("checkEmail"));
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        // One language choice per login: store it on the farmer's profile.
+        if (data.user) {
+          await supabase.from("profiles").update({ language: lang }).eq("id", data.user.id);
+        }
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong");
@@ -84,6 +88,32 @@ function AuthPage() {
             <p className="truncate text-sm font-medium text-soil-500">{t("tagline")}</p>
           </div>
         </div>
+
+        <section className="mb-5">
+          <h2 className="mb-3 font-display text-xl font-semibold text-soil">{t("chooseLanguage")}</h2>
+          <div className="grid grid-cols-3 gap-2.5">
+            {LANGUAGES.map((l) => {
+              const active = l.code === lang;
+              return (
+                <button
+                  key={l.code}
+                  type="button"
+                  onClick={() => setLang(l.code as LangCode)}
+                  className={`flex flex-col items-center gap-1 rounded-2xl py-3 ${
+                    active ? "bg-leaf text-cream ring-2 ring-leaf-700" : "bg-cream-2 ring-1 ring-black/5"
+                  }`}
+                >
+                  <span className={`font-display text-lg ${active ? "font-bold" : "font-semibold text-soil"}`}>
+                    {l.short}
+                  </span>
+                  <span className={`text-[13px] ${active ? "font-semibold" : "font-medium text-soil-500"}`}>
+                    {l.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
 
         <div className="mb-5 grid grid-cols-2 gap-2 rounded-2xl bg-cream-2 p-1.5 ring-1 ring-black/5">
           {(["in", "up"] as const).map((m) => (
