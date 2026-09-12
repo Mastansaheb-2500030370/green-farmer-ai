@@ -1,8 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Camera, ChevronRight, Leaf, Mic } from "lucide-react";
+import { Camera, ChevronRight, Leaf, MessageCircle, Mic, Store } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { LanguagePicker } from "@/components/LanguagePicker";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -75,8 +74,6 @@ function HomePage() {
         </span>
       </Link>
 
-      <LanguagePicker />
-
       <section className="mb-7">
         <h2 className="mb-3 font-display text-2xl font-semibold text-soil">{t("growMore")}</h2>
         <div className="space-y-2.5">
@@ -100,6 +97,26 @@ function HomePage() {
           <ChevronRight className="size-5" />
         </Link>
       </section>
+
+      <Link to="/chat" className="mb-3 flex items-center gap-4 rounded-3xl bg-cream-2 p-5 ring-1 ring-black/5">
+        <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-leaf/15">
+          <MessageCircle className="size-7 text-leaf-700" />
+        </span>
+        <span className="min-w-0">
+          <span className="block font-display text-xl font-semibold text-soil">{t("chatTitle")}</span>
+          <span className="block text-sm font-medium text-soil-500">{t("chatSubtitle")}</span>
+        </span>
+      </Link>
+
+      <Link to="/shops" className="mb-3 flex items-center gap-4 rounded-3xl bg-cream-2 p-5 ring-1 ring-black/5">
+        <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-clay/15">
+          <Store className="size-7 text-clay" />
+        </span>
+        <span className="min-w-0">
+          <span className="block font-display text-xl font-semibold text-soil">{t("shopsTitle")}</span>
+          <span className="block text-sm font-medium text-soil-500">{t("shopsSubtitle")}</span>
+        </span>
+      </Link>
 
       <Link to="/voice" className="mb-7 flex items-center gap-4 rounded-3xl bg-leaf p-5 ring-1 ring-leaf-700">
         <span className="grid size-14 shrink-0 place-items-center rounded-full bg-cream">

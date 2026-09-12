@@ -60,6 +60,27 @@ const en: Dict = {
   profile: "My account",
   saveProfile: "Save",
   checkEmail: "Check your email to confirm your account.",
+  chat: "Chat",
+  chatTitle: "Ask about your plant",
+  chatSubtitle: "Tell me what you see and I will guide you step by step.",
+  chatIntro:
+    "Namaste! I am your farm helper. Tell me your crop and what is wrong, and I will tell you exactly what to do next.",
+  chatQ1: "What should I do after the scan?",
+  chatQ2: "Which fertiliser should I use now?",
+  chatQ3: "How much water does my crop need?",
+  chatQ4: "How do I stop the disease from spreading?",
+  shops: "Shops",
+  shopsTitle: "Fertiliser shops near you",
+  shopsSubtitle: "Turn on your location to see farm supply shops close by.",
+  useLocation: "Use my location",
+  locating: "Finding shops near you…",
+  noShops: "No farm shops found nearby. Try again from your village centre.",
+  openMap: "Open in maps",
+  kmAway: "km away",
+  locationDenied: "Location is off. Please allow location in your phone settings.",
+  langSaved: "Language saved",
+  continue: "Continue",
+
 };
 
 const hi: Dict = {
@@ -108,6 +129,26 @@ const hi: Dict = {
   profile: "मेरा खाता",
   saveProfile: "सहेजें",
   checkEmail: "खाता पक्का करने के लिए ईमेल देखें।",
+  chat: "बातचीत",
+  chatTitle: "अपने पौधे के बारे में पूछें",
+  chatSubtitle: "जो दिख रहा है बताइए, मैं कदम-कदम बताऊँगा।",
+  chatIntro: "नमस्ते! मैं आपका खेत सहायक हूँ। फसल और परेशानी बताइए, मैं बताऊँगा आगे क्या करना है।",
+  chatQ1: "जाँच के बाद अब क्या करूँ?",
+  chatQ2: "अभी कौन सी खाद डालूँ?",
+  chatQ3: "फसल को कितना पानी चाहिए?",
+  chatQ4: "बीमारी फैलने से कैसे रोकूँ?",
+  shops: "दुकानें",
+  shopsTitle: "पास की खाद दुकानें",
+  shopsSubtitle: "लोकेशन चालू करें और पास की खेती दुकानें देखें।",
+  useLocation: "मेरी लोकेशन लें",
+  locating: "पास की दुकानें खोजी जा रही हैं…",
+  noShops: "पास कोई खेती दुकान नहीं मिली। गाँव के बीच से फिर कोशिश करें।",
+  openMap: "नक्शे में देखें",
+  kmAway: "कि.मी. दूर",
+  locationDenied: "लोकेशन बंद है। कृपया फोन सेटिंग में चालू करें।",
+  langSaved: "भाषा सहेजी गई",
+  continue: "आगे बढ़ें",
+
 };
 
 const mr: Dict = {
