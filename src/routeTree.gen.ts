@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as MeRouteImport } from './routes/me'
 import { Route as ScanRouteImport } from './routes/scan'
+import { Route as ShopsRouteImport } from './routes/shops'
 import { Route as TipsRouteImport } from './routes/tips'
 import { Route as VoiceRouteImport } from './routes/voice'
 
@@ -42,6 +43,11 @@ const ScanRoute = ScanRouteImport.update({
   path: '/scan',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShopsRoute = ShopsRouteImport.update({
+  id: '/shops',
+  path: '/shops',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TipsRoute = TipsRouteImport.update({
   id: '/tips',
   path: '/tips',
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/chat': typeof ChatRoute
   '/me': typeof MeRoute
   '/scan': typeof ScanRoute
+  '/shops': typeof ShopsRoute
   '/tips': typeof TipsRoute
   '/voice': typeof VoiceRoute
 }
@@ -68,6 +75,7 @@ export interface FileRoutesByTo {
   '/chat': typeof ChatRoute
   '/me': typeof MeRoute
   '/scan': typeof ScanRoute
+  '/shops': typeof ShopsRoute
   '/tips': typeof TipsRoute
   '/voice': typeof VoiceRoute
 }
@@ -78,16 +86,26 @@ export interface FileRoutesById {
   '/chat': typeof ChatRoute
   '/me': typeof MeRoute
   '/scan': typeof ScanRoute
+  '/shops': typeof ShopsRoute
   '/tips': typeof TipsRoute
   '/voice': typeof VoiceRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/chat' | '/me' | '/scan' | '/tips' | '/voice'
+  fullPaths:
+    '/' | '/auth' | '/chat' | '/me' | '/scan' | '/shops' | '/tips' | '/voice'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/chat' | '/me' | '/scan' | '/tips' | '/voice'
+  to: '/' | '/auth' | '/chat' | '/me' | '/scan' | '/shops' | '/tips' | '/voice'
   id:
-    '__root__' | '/' | '/auth' | '/chat' | '/me' | '/scan' | '/tips' | '/voice'
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/chat'
+    | '/me'
+    | '/scan'
+    | '/shops'
+    | '/tips'
+    | '/voice'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -96,6 +114,7 @@ export interface RootRouteChildren {
   ChatRoute: typeof ChatRoute
   MeRoute: typeof MeRoute
   ScanRoute: typeof ScanRoute
+  ShopsRoute: typeof ShopsRoute
   TipsRoute: typeof TipsRoute
   VoiceRoute: typeof VoiceRoute
 }
@@ -137,6 +156,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ScanRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shops': {
+      id: '/shops'
+      path: '/shops'
+      fullPath: '/shops'
+      preLoaderRoute: typeof ShopsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tips': {
       id: '/tips'
       path: '/tips'
@@ -160,6 +186,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChatRoute: ChatRoute,
   MeRoute: MeRoute,
   ScanRoute: ScanRoute,
+  ShopsRoute: ShopsRoute,
   TipsRoute: TipsRoute,
   VoiceRoute: VoiceRoute,
 }

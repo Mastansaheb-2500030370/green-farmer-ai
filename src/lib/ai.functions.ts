@@ -103,6 +103,7 @@ export const analyzePlant = createServerFn({ method: "POST" })
 
 const AskInput = z.object({
   language: z.string().min(2).max(5),
+  context: z.string().max(1200).optional(),
   messages: z
     .array(z.object({ role: z.enum(["user", "assistant"]), content: z.string().min(1) }))
     .min(1)
@@ -121,11 +122,14 @@ export const askAssistant = createServerFn({ method: "POST" })
           content:
             `You are KisanSahayak, a friendly farming assistant for Indian farmers. Answer in ${language} only, in short simple sentences (max 6 sentences). ` +
             `Give practical advice on crop care, irrigation, fertiliser, pests, diseases, seed choice and getting a higher yield. Use local units (acre, litre, kg). ` +
-            `If a question is not about farming, gently bring it back to the farm.`,
+            `When the farmer asks what to do next, answer as clear numbered steps with quantities and timing, and end with one short follow-up question. ` +
+            `If a question is not about farming, gently bring it back to the farm.` +
+            (data.context ? ` Background about this farmer: ${data.context}` : ""),
         },
         ...data.messages,
       ],
     });
+
     return { answer };
   });
 
