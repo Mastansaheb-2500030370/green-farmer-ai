@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ChatRouteImport } from './routes/chat'
 import { Route as MeRouteImport } from './routes/me'
 import { Route as ScanRouteImport } from './routes/scan'
 import { Route as TipsRouteImport } from './routes/tips'
@@ -24,6 +25,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatRoute = ChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MeRoute = MeRouteImport.update({
@@ -50,6 +56,7 @@ const VoiceRoute = VoiceRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/chat': typeof ChatRoute
   '/me': typeof MeRoute
   '/scan': typeof ScanRoute
   '/tips': typeof TipsRoute
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/chat': typeof ChatRoute
   '/me': typeof MeRoute
   '/scan': typeof ScanRoute
   '/tips': typeof TipsRoute
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/chat': typeof ChatRoute
   '/me': typeof MeRoute
   '/scan': typeof ScanRoute
   '/tips': typeof TipsRoute
@@ -74,15 +83,17 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/me' | '/scan' | '/tips' | '/voice'
+  fullPaths: '/' | '/auth' | '/chat' | '/me' | '/scan' | '/tips' | '/voice'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/me' | '/scan' | '/tips' | '/voice'
-  id: '__root__' | '/' | '/auth' | '/me' | '/scan' | '/tips' | '/voice'
+  to: '/' | '/auth' | '/chat' | '/me' | '/scan' | '/tips' | '/voice'
+  id:
+    '__root__' | '/' | '/auth' | '/chat' | '/me' | '/scan' | '/tips' | '/voice'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  ChatRoute: typeof ChatRoute
   MeRoute: typeof MeRoute
   ScanRoute: typeof ScanRoute
   TipsRoute: typeof TipsRoute
@@ -103,6 +114,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chat': {
+      id: '/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/me': {
@@ -139,6 +157,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  ChatRoute: ChatRoute,
   MeRoute: MeRoute,
   ScanRoute: ScanRoute,
   TipsRoute: TipsRoute,
