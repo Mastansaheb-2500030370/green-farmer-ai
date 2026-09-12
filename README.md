@@ -1,14 +1,18 @@
-# Welcome to your Lovable project
+# Agro Pal
+
+I want to create an app  about the plants and the farmers  as their suitable languague  they want to know what kind of this that they must do to get the crop yeild more and the plant disease detector   as the farmer visits this website and upload or scan the disease of the tree   also place an AI assistant for speaking of farmers
 
 This project was built with [Lovable](https://lovable.dev).
 
+**Live app**: https://green-farmer-ai.lovable.app
+
 ## Build with Lovable
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
+Continue developing this project in the [Lovable editor](https://lovable.dev/projects/78571aa0-6198-43f4-babf-b4e3c90902cc).
 
 - **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
+- **Stay in sync**: every change made in Lovable is committed straight to this repository.
+- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
 
 ## Development
 
@@ -20,10 +24,3 @@ cd <repository-name>
 npm i
 npm run dev
 ```
-
-## Built with
-
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
