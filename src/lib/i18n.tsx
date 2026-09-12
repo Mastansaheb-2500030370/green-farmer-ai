@@ -60,6 +60,27 @@ const en: Dict = {
   profile: "My account",
   saveProfile: "Save",
   checkEmail: "Check your email to confirm your account.",
+  chat: "Chat",
+  chatTitle: "Ask about your plant",
+  chatSubtitle: "Tell me what you see and I will guide you step by step.",
+  chatIntro:
+    "Namaste! I am your farm helper. Tell me your crop and what is wrong, and I will tell you exactly what to do next.",
+  chatQ1: "What should I do after the scan?",
+  chatQ2: "Which fertiliser should I use now?",
+  chatQ3: "How much water does my crop need?",
+  chatQ4: "How do I stop the disease from spreading?",
+  shops: "Shops",
+  shopsTitle: "Fertiliser shops near you",
+  shopsSubtitle: "Turn on your location to see farm supply shops close by.",
+  useLocation: "Use my location",
+  locating: "Finding shops near you…",
+  noShops: "No farm shops found nearby. Try again from your village centre.",
+  openMap: "Open in maps",
+  kmAway: "km away",
+  locationDenied: "Location is off. Please allow location in your phone settings.",
+  langSaved: "Language saved",
+  continue: "Continue",
+
 };
 
 const hi: Dict = {
