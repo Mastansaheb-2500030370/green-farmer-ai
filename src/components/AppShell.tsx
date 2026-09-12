@@ -1,21 +1,40 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Camera, Home, Leaf, Mic, User } from "lucide-react";
-import type { ReactNode } from "react";
-import { useI18n } from "@/lib/i18n";
+import { Camera, Home, MessageCircle, Store, User } from "lucide-react";
+import { useEffect, type ReactNode } from "react";
+import { useI18n, type LangCode } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const { t } = useI18n();
+  const { t, setLang } = useI18n();
   const { user } = useAuth();
   const path = useRouterState({ select: (s) => s.location.pathname });
+
+  // The farmer picks a language once at sign in; every later visit follows the saved choice.
+  useEffect(() => {
+    if (!user) return;
+    let active = true;
+    void supabase
+      .from("profiles")
+      .select("language")
+      .eq("id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        const saved = data?.language as LangCode | undefined;
+        if (active && saved && saved !== window.localStorage.getItem("ks-lang")) setLang(saved);
+      });
+    return () => {
+      active = false;
+    };
+  }, [user, setLang]);
 
   const initial = (user?.user_metadata?.["full_name"] as string | undefined)?.[0]?.toUpperCase() ?? "?";
 
   const nav = [
     { to: "/", label: t("home"), Icon: Home },
     { to: "/scan", label: t("scan"), Icon: Camera },
-    { to: "/voice", label: t("voice"), Icon: Mic },
-    { to: "/tips", label: t("tips"), Icon: Leaf },
+    { to: "/chat", label: t("chat"), Icon: MessageCircle },
+    { to: "/shops", label: t("shops"), Icon: Store },
     { to: "/me", label: t("me"), Icon: User },
   ] as const;
 
