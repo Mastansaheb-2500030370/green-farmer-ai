@@ -1,7 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { ClientOnly, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2, MapPin, Navigation, Phone, Store } from "lucide-react";
-import { useState } from "react";
+import { Suspense, lazy, useState } from "react";
+
+const ShopsMap = lazy(() => import("@/components/ShopsMap"));
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { findNearbyShops, type NearbyShop } from "@/lib/places.functions";
@@ -32,6 +34,8 @@ function ShopsPage() {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [shops, setShops] = useState<NearbyShop[]>([]);
+  const [center, setCenter] = useState<{ lat: number; lon: number } | null>(null);
+  const [focusId, setFocusId] = useState<string | null>(null);
 
   const locate = () => {
     if (!navigator.geolocation) {
@@ -50,6 +54,8 @@ function ShopsPage() {
             },
           });
           setShops(found);
+          setCenter({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+          setFocusId(null);
           setSearched(true);
         } catch (error) {
           toast.error(error instanceof Error ? error.message : "Could not find shops");
@@ -80,9 +86,23 @@ function ShopsPage() {
         {loading ? t("locating") : t("useLocation")}
       </button>
 
+      {center ? (
+        <div className="mt-5 overflow-hidden rounded-2xl">
+          <ClientOnly fallback={<div className="h-72 w-full animate-pulse rounded-2xl bg-cream-2" />}>
+            <Suspense fallback={<div className="h-72 w-full animate-pulse rounded-2xl bg-cream-2" />}>
+              <ShopsMap center={center} shops={shops} focusId={focusId} />
+            </Suspense>
+          </ClientOnly>
+        </div>
+      ) : null}
+
       <section className="mt-6 space-y-2.5">
         {shops.map((shop) => (
-          <article key={shop.id} className="rounded-2xl bg-cream-2 p-4 ring-1 ring-black/5">
+          <article
+            key={shop.id}
+            onClick={() => setFocusId(shop.id)}
+            className="cursor-pointer rounded-2xl bg-cream-2 p-4 ring-1 ring-black/5"
+          >
             <div className="flex items-start gap-3">
               <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-leaf/15">
                 <Store className="size-5 text-leaf-700" />
