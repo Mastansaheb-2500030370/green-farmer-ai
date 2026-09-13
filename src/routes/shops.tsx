@@ -1,7 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { ClientOnly, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2, MapPin, Navigation, Phone, Store } from "lucide-react";
-import { useState } from "react";
+import { Suspense, lazy, useState } from "react";
+
+const ShopsMap = lazy(() => import("@/components/ShopsMap"));
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { findNearbyShops, type NearbyShop } from "@/lib/places.functions";
