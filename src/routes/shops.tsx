@@ -54,6 +54,8 @@ function ShopsPage() {
             },
           });
           setShops(found);
+          setCenter({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+          setFocusId(null);
           setSearched(true);
         } catch (error) {
           toast.error(error instanceof Error ? error.message : "Could not find shops");
