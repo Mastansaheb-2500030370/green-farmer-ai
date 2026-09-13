@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/lib/auth";
 import { LANGUAGES, useI18n, type LangCode } from "@/lib/i18n";
 
