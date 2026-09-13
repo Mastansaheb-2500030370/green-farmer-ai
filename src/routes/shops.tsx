@@ -34,6 +34,8 @@ function ShopsPage() {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [shops, setShops] = useState<NearbyShop[]>([]);
+  const [center, setCenter] = useState<{ lat: number; lon: number } | null>(null);
+  const [focusId, setFocusId] = useState<string | null>(null);
 
   const locate = () => {
     if (!navigator.geolocation) {
