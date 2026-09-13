@@ -86,9 +86,23 @@ function ShopsPage() {
         {loading ? t("locating") : t("useLocation")}
       </button>
 
+      {center ? (
+        <div className="mt-5 overflow-hidden rounded-2xl">
+          <ClientOnly fallback={<div className="h-72 w-full animate-pulse rounded-2xl bg-cream-2" />}>
+            <Suspense fallback={<div className="h-72 w-full animate-pulse rounded-2xl bg-cream-2" />}>
+              <ShopsMap center={center} shops={shops} focusId={focusId} />
+            </Suspense>
+          </ClientOnly>
+        </div>
+      ) : null}
+
       <section className="mt-6 space-y-2.5">
         {shops.map((shop) => (
-          <article key={shop.id} className="rounded-2xl bg-cream-2 p-4 ring-1 ring-black/5">
+          <article
+            key={shop.id}
+            onClick={() => setFocusId(shop.id)}
+            className="cursor-pointer rounded-2xl bg-cream-2 p-4 ring-1 ring-black/5"
+          >
             <div className="flex items-start gap-3">
               <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-leaf/15">
                 <Store className="size-5 text-leaf-700" />
