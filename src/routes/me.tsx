@@ -1,11 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { LogOut } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { LogOut, Shield } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { checkAdmin } from "@/lib/admin.functions";
 import { LANGUAGES, useI18n, type LangCode } from "@/lib/i18n";
 
 export const Route = createFileRoute("/me")({
@@ -57,6 +59,19 @@ function MePage() {
         .limit(50);
       if (error) throw error;
       return data;
+    },
+  });
+
+  const checkAdminFn = useServerFn(checkAdmin);
+  const { data: adminCheck } = useQuery({
+    queryKey: ["admin-check", user?.id],
+    enabled: Boolean(user),
+    queryFn: async () => {
+      try {
+        return await checkAdminFn({ data: undefined });
+      } catch {
+        return { isAdmin: false };
+      }
     },
   });
 
@@ -161,10 +176,20 @@ function MePage() {
         )}
       </section>
 
+      {adminCheck?.isAdmin && (
+        <Link
+          to="/admin"
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-soil py-4 text-base font-semibold text-cream ring-1 ring-soil-800"
+        >
+          <Shield className="size-5" />
+          {t("adminConsole")}
+        </Link>
+      )}
+
       <button
         type="button"
         onClick={signOut}
-        className="mt-7 flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-base font-semibold text-clay ring-1 ring-clay/30"
+        className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-base font-semibold text-clay ring-1 ring-clay/30"
       >
         <LogOut className="size-5" />
         {t("signOut")}
