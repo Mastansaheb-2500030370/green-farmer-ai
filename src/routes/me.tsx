@@ -1,11 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { LogOut } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { LogOut, Shield } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { checkAdmin } from "@/lib/admin.functions";
 import { LANGUAGES, useI18n, type LangCode } from "@/lib/i18n";
 
 export const Route = createFileRoute("/me")({

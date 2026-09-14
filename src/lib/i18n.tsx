@@ -80,6 +80,7 @@ const en: Dict = {
   locationDenied: "Location is off. Please allow location in your phone settings.",
   langSaved: "Language saved",
   continue: "Continue",
+  adminConsole: "Admin console",
 
 };
 
