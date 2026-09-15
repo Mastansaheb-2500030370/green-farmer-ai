@@ -1,10 +1,15 @@
 # KisanSahayak roadmap
 
-- [ ] Design system tokens (Field Sunlight) in src/styles.css
-- [ ] 7-language support (EN, HI, MR, BN, TE, TA, KN)
-- [ ] Farmer login (email/password + Google) with profiles table
-- [ ] Plant disease detection: camera scan + photo upload, AI analysis
-- [ ] Scan history saved per farmer
-- [ ] Crop yield tips
-- [ ] AI assistant: voice (speak/listen) and text chat
-- [ ] Mobile-first layout, works well on phones (user request)
+- [x] Design system tokens (Field Sunlight) in src/styles.css
+- [x] 7-language support (EN, HI, MR, BN, TE, TA, KN)
+- [x] Farmer login (email/password + Google) with profiles table
+- [x] Plant disease detection: camera scan + photo upload, AI analysis
+- [x] Scan history saved per farmer
+- [x] Crop yield tips
+- [x] AI assistant: voice (speak/listen) and text chat
+- [x] Mobile-first layout, works well on phones
+- [x] Nearby fertiliser shops with map
+- [x] Admin console at /admin with farmer list
+- [ ] Fertiliser database: browse/search guide + admin add form
+- [ ] Admin management: manage fertilisers (add, show/hide) from admin console
+- [ ] Professional polish pass across pages (user request)

@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      fertilizers: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          crops: string[]
+          dosage: string | null
+          id: string
+          is_active: boolean
+          kind: string
+          name: string
+          notes: string | null
+          nutrients: string | null
+          price_range: string | null
+          problems: string[]
+          timing: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          crops?: string[]
+          dosage?: string | null
+          id?: string
+          is_active?: boolean
+          kind?: string
+          name: string
+          notes?: string | null
+          nutrients?: string | null
+          price_range?: string | null
+          problems?: string[]
+          timing?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          crops?: string[]
+          dosage?: string | null
+          id?: string
+          is_active?: boolean
+          kind?: string
+          name?: string
+          notes?: string | null
+          nutrients?: string | null
+          price_range?: string | null
+          problems?: string[]
+          timing?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

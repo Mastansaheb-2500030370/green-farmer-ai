@@ -81,6 +81,18 @@ const en: Dict = {
   langSaved: "Language saved",
   continue: "Continue",
   adminConsole: "Admin console",
+  fertilizers: "Fertilisers",
+  fertTitle: "Fertiliser guide",
+  fertSubtitle: "Which fertiliser to use, how much, and when.",
+  searchFert: "Search crop, problem or fertiliser",
+  noFert: "No fertiliser matches your search.",
+  addFert: "Add a fertiliser",
+  fertAdded: "Fertiliser added",
+  dosage: "How much",
+  timing: "When to use",
+  goodFor: "Good for",
+  helpsWith: "Helps with",
+  price: "Approx price",
 
 };
 

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { Loader2, LogOut, ShieldCheck } from "lucide-react";
@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { listFarmers } from "@/lib/admin.functions";
+import { FertilizerForm } from "@/components/FertilizerForm";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -103,6 +104,7 @@ function AdminLogin() {
 
 function AdminDashboard() {
   const fetchFarmers = useServerFn(listFarmers);
+  const [tab, setTab] = useState<"farmers" | "fertilizers">("farmers");
   const { data, isLoading, error } = useQuery({
     queryKey: ["admin-farmers"],
     queryFn: () => fetchFarmers(),
@@ -123,7 +125,7 @@ function AdminDashboard() {
             </span>
             <div>
               <h1 className="font-display text-2xl font-semibold text-cream">Admin console</h1>
-              <p className="text-sm font-medium text-cream/60">Registered farmers</p>
+              <p className="text-sm font-medium text-cream/60">Farmers and fertiliser database</p>
             </div>
           </div>
           <button
@@ -134,7 +136,23 @@ function AdminDashboard() {
           </button>
         </header>
 
-        {isLoading ? (
+        <nav className="mb-5 flex gap-2">
+          {(["farmers", "fertilizers"] as const).map((key) => (
+            <button
+              key={key}
+              onClick={() => setTab(key)}
+              className={`rounded-xl px-4 py-2.5 text-sm font-semibold capitalize ${
+                tab === key ? "bg-sun text-soil" : "bg-cream-2/20 text-cream"
+              }`}
+            >
+              {key === "farmers" ? "Farmers" : "Fertilisers"}
+            </button>
+          ))}
+        </nav>
+
+        {tab === "fertilizers" ? (
+          <FertilizerAdmin />
+        ) : isLoading ? (
           <div className="grid place-items-center py-20">
             <Loader2 className="size-6 animate-spin text-cream" />
           </div>
@@ -143,6 +161,7 @@ function AdminDashboard() {
             This account is not an admin. Sign in with an admin account.
           </p>
         ) : (
+
           <>
             <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
               <Stat label="Farmers" value={data?.farmers.length ?? 0} />
@@ -200,6 +219,96 @@ function AdminDashboard() {
     </div>
   );
 }
+
+function FertilizerAdmin() {
+  const qc = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-fertilizers"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("fertilizers")
+        .select("id, name, kind, nutrients, crops, dosage, is_active")
+        .order("name");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const toggle = async (id: string, next: boolean) => {
+    const { error } = await supabase.from("fertilizers").update({ is_active: next }).eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    await qc.invalidateQueries({ queryKey: ["admin-fertilizers"] });
+    await qc.invalidateQueries({ queryKey: ["fertilizers"] });
+  };
+
+  return (
+    <div className="space-y-5">
+      <div>
+        <h2 className="mb-3 font-display text-xl font-semibold text-cream">Add a fertiliser</h2>
+        <FertilizerForm />
+      </div>
+
+      <div>
+        <h2 className="mb-3 font-display text-xl font-semibold text-cream">
+          Fertiliser database ({data?.length ?? 0})
+        </h2>
+        {isLoading ? (
+          <div className="grid place-items-center py-12">
+            <Loader2 className="size-6 animate-spin text-cream" />
+          </div>
+        ) : (
+          <div className="overflow-x-auto rounded-2xl bg-cream-2 ring-1 ring-black/10">
+            <table className="w-full min-w-[640px] text-left text-sm">
+              <thead className="bg-cream text-soil-500">
+                <tr>
+                  <th className="px-4 py-3 font-semibold">Name</th>
+                  <th className="px-4 py-3 font-semibold">Type</th>
+                  <th className="px-4 py-3 font-semibold">Nutrients</th>
+                  <th className="px-4 py-3 font-semibold">Crops</th>
+                  <th className="px-4 py-3 font-semibold">Dose</th>
+                  <th className="px-4 py-3 font-semibold">Shown</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(data ?? []).map((f) => (
+                  <tr key={f.id} className="border-t border-black/5 text-soil">
+                    <td className="px-4 py-3 font-semibold">{f.name}</td>
+                    <td className="px-4 py-3 capitalize">{f.kind}</td>
+                    <td className="px-4 py-3">{f.nutrients ?? "—"}</td>
+                    <td className="px-4 py-3">{f.crops.join(", ") || "—"}</td>
+                    <td className="px-4 py-3">{f.dosage ?? "—"}</td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => toggle(f.id, !f.is_active)}
+                        className={`rounded-full px-3 py-1.5 text-xs font-bold ${
+                          f.is_active ? "bg-leaf text-cream" : "bg-cream text-soil-500 ring-1 ring-black/10"
+                        }`}
+                      >
+                        {f.is_active ? "Visible" : "Hidden"}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {data && data.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-4 py-8 text-center font-medium text-soil-500">
+                      No fertilisers yet. Add the first one above.
+                    </td>
+                  </tr>
+                ) : null}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (

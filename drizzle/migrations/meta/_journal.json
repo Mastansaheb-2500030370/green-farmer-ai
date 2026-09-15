@@ -15,6 +15,13 @@
       "when": 1789310123785,
       "tag": "0001_admin_roles",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789451743814,
+      "tag": "0002_create_fertilizers",
+      "breakpoints": true
     }
   ]
 }
