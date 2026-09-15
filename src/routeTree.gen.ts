@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ChatRouteImport } from './routes/chat'
+import { Route as FertilizersRouteImport } from './routes/fertilizers'
 import { Route as MeRouteImport } from './routes/me'
 import { Route as ScanRouteImport } from './routes/scan'
 import { Route as ShopsRouteImport } from './routes/shops'
@@ -37,6 +38,11 @@ const AuthRoute = AuthRouteImport.update({
 const ChatRoute = ChatRouteImport.update({
   id: '/chat',
   path: '/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FertilizersRoute = FertilizersRouteImport.update({
+  id: '/fertilizers',
+  path: '/fertilizers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MeRoute = MeRouteImport.update({
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/chat': typeof ChatRoute
+  '/fertilizers': typeof FertilizersRoute
   '/me': typeof MeRoute
   '/scan': typeof ScanRoute
   '/shops': typeof ShopsRoute
@@ -81,6 +88,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/chat': typeof ChatRoute
+  '/fertilizers': typeof FertilizersRoute
   '/me': typeof MeRoute
   '/scan': typeof ScanRoute
   '/shops': typeof ShopsRoute
@@ -93,6 +101,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/chat': typeof ChatRoute
+  '/fertilizers': typeof FertilizersRoute
   '/me': typeof MeRoute
   '/scan': typeof ScanRoute
   '/shops': typeof ShopsRoute
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/chat'
+    | '/fertilizers'
     | '/me'
     | '/scan'
     | '/shops'
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/chat'
+    | '/fertilizers'
     | '/me'
     | '/scan'
     | '/shops'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/chat'
+    | '/fertilizers'
     | '/me'
     | '/scan'
     | '/shops'
@@ -140,6 +152,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   ChatRoute: typeof ChatRoute
+  FertilizersRoute: typeof FertilizersRoute
   MeRoute: typeof MeRoute
   ScanRoute: typeof ScanRoute
   ShopsRoute: typeof ShopsRoute
@@ -175,6 +188,13 @@ declare module '@tanstack/react-router' {
       path: '/chat'
       fullPath: '/chat'
       preLoaderRoute: typeof ChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fertilizers': {
+      id: '/fertilizers'
+      path: '/fertilizers'
+      fullPath: '/fertilizers'
+      preLoaderRoute: typeof FertilizersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/me': {
@@ -220,6 +240,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   ChatRoute: ChatRoute,
+  FertilizersRoute: FertilizersRoute,
   MeRoute: MeRoute,
   ScanRoute: ScanRoute,
   ShopsRoute: ShopsRoute,
