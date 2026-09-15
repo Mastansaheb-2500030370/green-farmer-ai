@@ -1,14 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { Loader2, Plus, Search, Sprout } from "lucide-react";
-import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { checkAdmin } from "@/lib/admin.functions";
+import { FertilizerForm } from "@/components/FertilizerForm";
 
 export const Route = createFileRoute("/fertilizers")({
   head: () => ({
@@ -43,8 +43,6 @@ type Fertilizer = {
   price_range: string | null;
   notes: string | null;
 };
-
-const KINDS = ["chemical", "organic", "bio", "micronutrient"];
 
 function FertilizersPage() {
   const { t } = useI18n();
@@ -110,7 +108,7 @@ function FertilizersPage() {
         </button>
       ) : null}
 
-      {adminData?.isAdmin && showForm ? <AddFertilizerForm onDone={() => setShowForm(false)} /> : null}
+      {adminData?.isAdmin && showForm ? <div className="mt-3"><FertilizerForm onDone={() => setShowForm(false)} submitLabel={t("addFert")} /></div> : null}
 
       {isLoading ? (
         <div className="grid place-items-center py-16">
@@ -159,80 +157,5 @@ function Row({ label, value }: { label: string; value: string }) {
       <dt className="shrink-0 text-soil-500">{label}:</dt>
       <dd className="min-w-0">{value}</dd>
     </div>
-  );
-}
-
-function AddFertilizerForm({ onDone }: { onDone: () => void }) {
-  const { t } = useI18n();
-  const qc = useQueryClient();
-  const [busy, setBusy] = useState(false);
-  const [form, setForm] = useState({
-    name: "",
-    kind: "chemical",
-    nutrients: "",
-    crops: "",
-    problems: "",
-    dosage: "",
-    timing: "",
-    price_range: "",
-    notes: "",
-  });
-
-  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setForm((f) => ({ ...f, [k]: e.target.value }));
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setBusy(true);
-    const { error } = await supabase.from("fertilizers").insert({
-      name: form.name.trim(),
-      kind: form.kind,
-      nutrients: form.nutrients.trim() || null,
-      crops: form.crops.split(",").map((s) => s.trim()).filter(Boolean),
-      problems: form.problems.split(",").map((s) => s.trim()).filter(Boolean),
-      dosage: form.dosage.trim() || null,
-      timing: form.timing.trim() || null,
-      price_range: form.price_range.trim() || null,
-      notes: form.notes.trim() || null,
-    });
-    setBusy(false);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success(t("fertAdded"));
-    await qc.invalidateQueries({ queryKey: ["fertilizers"] });
-    onDone();
-  };
-
-  const field =
-    "w-full rounded-xl bg-cream px-4 py-3 text-base font-medium text-soil ring-1 ring-black/10 outline-none focus:ring-2 focus:ring-leaf";
-
-  return (
-    <form onSubmit={submit} className="mt-3 space-y-2.5 rounded-2xl bg-cream-2 p-4 ring-1 ring-black/10">
-      <input className={field} placeholder="Name (e.g. Urea)" value={form.name} onChange={set("name")} required />
-      <select className={field} value={form.kind} onChange={set("kind")}>
-        {KINDS.map((k) => (
-          <option key={k} value={k}>
-            {k}
-          </option>
-        ))}
-      </select>
-      <input className={field} placeholder="Nutrients (e.g. N 46%)" value={form.nutrients} onChange={set("nutrients")} />
-      <input className={field} placeholder="Crops, comma separated" value={form.crops} onChange={set("crops")} />
-      <input className={field} placeholder="Problems it solves, comma separated" value={form.problems} onChange={set("problems")} />
-      <input className={field} placeholder="How much per acre" value={form.dosage} onChange={set("dosage")} />
-      <input className={field} placeholder="When to apply" value={form.timing} onChange={set("timing")} />
-      <input className={field} placeholder="Approx price" value={form.price_range} onChange={set("price_range")} />
-      <input className={field} placeholder="Notes" value={form.notes} onChange={set("notes")} />
-      <button
-        type="submit"
-        disabled={busy}
-        className="flex w-full items-center justify-center gap-2 rounded-xl bg-leaf py-3.5 text-base font-semibold text-cream disabled:opacity-70"
-      >
-        {busy ? <Loader2 className="size-5 animate-spin" /> : <Plus className="size-5" />}
-        {t("addFert")}
-      </button>
-    </form>
   );
 }
