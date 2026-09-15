@@ -103,6 +103,7 @@ function AdminLogin() {
 
 function AdminDashboard() {
   const fetchFarmers = useServerFn(listFarmers);
+  const [tab, setTab] = useState<"farmers" | "fertilizers">("farmers");
   const { data, isLoading, error } = useQuery({
     queryKey: ["admin-farmers"],
     queryFn: () => fetchFarmers(),
@@ -123,7 +124,7 @@ function AdminDashboard() {
             </span>
             <div>
               <h1 className="font-display text-2xl font-semibold text-cream">Admin console</h1>
-              <p className="text-sm font-medium text-cream/60">Registered farmers</p>
+              <p className="text-sm font-medium text-cream/60">Farmers and fertiliser database</p>
             </div>
           </div>
           <button
@@ -134,7 +135,23 @@ function AdminDashboard() {
           </button>
         </header>
 
-        {isLoading ? (
+        <nav className="mb-5 flex gap-2">
+          {(["farmers", "fertilizers"] as const).map((key) => (
+            <button
+              key={key}
+              onClick={() => setTab(key)}
+              className={`rounded-xl px-4 py-2.5 text-sm font-semibold capitalize ${
+                tab === key ? "bg-sun text-soil" : "bg-cream-2/20 text-cream"
+              }`}
+            >
+              {key === "farmers" ? "Farmers" : "Fertilisers"}
+            </button>
+          ))}
+        </nav>
+
+        {tab === "fertilizers" ? (
+          <FertilizerAdmin />
+        ) : isLoading ? (
           <div className="grid place-items-center py-20">
             <Loader2 className="size-6 animate-spin text-cream" />
           </div>
@@ -143,6 +160,7 @@ function AdminDashboard() {
             This account is not an admin. Sign in with an admin account.
           </p>
         ) : (
+
           <>
             <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
               <Stat label="Farmers" value={data?.farmers.length ?? 0} />
